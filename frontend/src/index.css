@@ -1,0 +1,155 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 100% 97%;
+    --foreground: 210 40% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 210 40% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 40% 10%;
+    --primary: 195 85% 45%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 142 76% 36%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 210 20% 40%;
+    --accent: 195 85% 90%;
+    --accent-foreground: 195 85% 20%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 210 40% 85%;
+    --input: 210 40% 85%;
+    --ring: 195 85% 45%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    color-scheme: dark;
+    --background: 222 47% 11%;
+    --foreground: 210 40% 96%;
+    --card: 222 47% 14%;
+    --card-foreground: 210 40% 96%;
+    --popover: 222 47% 14%;
+    --popover-foreground: 210 40% 96%;
+    --primary: 195 85% 55%;
+    --primary-foreground: 210 40% 10%;
+    --secondary: 174 62% 42%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 222 35% 18%;
+    --muted-foreground: 215 20% 70%;
+    --accent: 195 35% 22%;
+    --accent-foreground: 195 85% 90%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 222 30% 24%;
+    --input: 222 30% 24%;
+    --ring: 195 85% 55%;
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+}
+
+html.dark body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+html.dark .bg-white {
+  background-color: hsl(var(--card)) !important;
+  color: hsl(var(--card-foreground)) !important;
+}
+
+html.dark .bg-gray-50 {
+  background-color: hsl(var(--background)) !important;
+}
+
+html.dark .bg-gray-100 {
+  background-color: hsl(var(--muted)) !important;
+}
+
+html.dark .bg-gray-200 {
+  background-color: hsl(var(--border)) !important;
+}
+
+html.dark .border-gray-200,
+html.dark .border-gray-300 {
+  border-color: hsl(var(--border)) !important;
+}
+
+html.dark .text-gray-900,
+html.dark .text-gray-800,
+html.dark .text-gray-700 {
+  color: hsl(var(--foreground)) !important;
+}
+
+html.dark .text-gray-600,
+html.dark .text-gray-500 {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+html.dark .hover\:bg-gray-50:hover,
+html.dark .hover\:bg-gray-100:hover {
+  background-color: hsl(var(--muted)) !important;
+}
+
+html.dark .shadow-sm,
+html.dark .shadow,
+html.dark .shadow-lg,
+html.dark .shadow-xl,
+html.dark .shadow-2xl {
+  --tw-shadow-color: rgba(0, 0, 0, 0.4);
+}
+
+/* ═══ Fix z-index: todos los portales de Radix UI por encima de todo ═══ */
+[data-radix-popper-content-wrapper] {
+  z-index: 9999 !important;
+}
+
+[data-radix-portal] {
+  z-index: 9999 !important;
+}
+
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Ajuste: bajar z-index de contenedor y controles de Leaflet
+   para que la barra superior (z-50) y el sidebar (z-40) queden por encima
+   y el mapa no se interponga al hacer scroll. */
+.leaflet-container {
+  z-index: 0 !important;
+}
+
+.leaflet-container .leaflet-control {
+  z-index: 5 !important;
+}
+
+.leaflet-container .leaflet-popup {
+  z-index: 10 !important;
+}
+
+.leaflet-popup-content-wrapper {
+  z-index: 10 !important;
+}
+
+.leaflet-popup-tip {
+  z-index: 10 !important;
+}

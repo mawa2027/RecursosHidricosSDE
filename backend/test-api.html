@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head><title>Test API</title></head>
+<body style="font-family:monospace; padding:20px; background:#1a1a2e; color:#eee;">
+  <h2>🌊 Test Backend - Recursos Hídricos</h2>
+  
+  <button onclick="testHealth()">Test /api/health</button>
+  <button onclick="testLogin()">Test Login (admin)</button>
+  <button onclick="testObras()">Test Listar Obras</button>
+  
+  <pre id="output" style="background:#16213e; padding:15px; margin-top:15px; border-radius:8px; white-space:pre-wrap;"></pre>
+
+  <script>
+    const BASE = 'http://localhost:4000';
+    let TOKEN = '';
+    const out = document.getElementById('output');
+
+    async function testHealth() {
+      out.textContent = '⏳ Probando /api/health...';
+      try {
+        const r = await fetch(BASE + '/api/health');
+        const d = await r.json();
+        out.textContent = '✅ Health:\n' + JSON.stringify(d, null, 2);
+      } catch(e) {
+        out.textContent = '❌ Error: ' + e.message;
+      }
+    }
+
+    async function testLogin() {
+      out.textContent = '⏳ Probando login...';
+      try {
+        const r = await fetch(BASE + '/api/auth/login', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            correo: 'admin@recursoshidricos.gob.ar',
+            contrasena: 'admin123'
+          })
+        });
+        const d = await r.json();
+        if (d.token) TOKEN = d.token;
+        out.textContent = '✅ Login (status ' + r.status + '):\n' + JSON.stringify(d, null, 2);
+      } catch(e) {
+        out.textContent = '❌ Error: ' + e.message;
+      }
+    }
+
+    async function testObras() {
+      if (!TOKEN) { out.textContent = '⚠️ Primero hacé login!'; return; }
+      out.textContent = '⏳ Obteniendo obras...';
+      try {
+        const r = await fetch(BASE + '/api/obras', {
+          headers: {'Authorization': 'Bearer ' + TOKEN}
+        });
+        const d = await r.json();
+        out.textContent = '✅ Obras (status ' + r.status + '):\n' + JSON.stringify(d, null, 2);
+      } catch(e) {
+        out.textContent = '❌ Error: ' + e.message;
+      }
+    }
+  </script>
+</body>
+</html>

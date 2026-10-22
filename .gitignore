@@ -1,0 +1,24 @@
+@"
+# --- Frontend (Vite/React)
+frontend/node_modules/
+frontend/dist/
+
+
+# --- Backend (Node o Python, listo para ambos)
+backend/node_modules/
+backend/.venv/
+backend/venv/
+backend/__pycache__/
+backend/.pytest_cache/
+backend/*.sqlite3
+
+# --- Comunes
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.env
+.env.*
+"@ | Out-File -Encoding utf8 .gitignore
+node_modules/
+
