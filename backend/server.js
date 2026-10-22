@@ -17,10 +17,17 @@ require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 const app = express();
 const port = process.env.PORT || 4000;
-const JWT_SECRET = process.env.JWT_SECRET || 'recursos-hidricos-sde-secret';
+
+// [CAMBIO SERVIDOR] La clave de sesión es obligatoria: ya no hay un valor por defecto público.
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  console.error('Falta la variable JWT_SECRET');
+  process.exit(1);
+}
 
 // ─── Middlewares ──────────────────────────────────────
-app.use(helmet());
+// [CAMBIO SERVIDOR] Permite que el frontend (otro dominio) cargue imágenes de la API.
+app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 app.use(cors({
   origin: [
     process.env.FRONTEND_URL || 'http://localhost:3000',
@@ -34,9 +41,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
 // Rate limiting
+// [CAMBIO SERVIDOR] Detrás de Cloudflare se usa la IP real del visitante.
+const ipCliente = (req) => req.headers['cf-connecting-ip'] || req.ip;
+
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 200,
+  keyGenerator: ipCliente,
+  validate: { xForwardedForHeader: false, trustProxy: false },
   message: { error: 'Demasiadas solicitudes, intenta de nuevo más tarde' },
 });
 app.use('/api/', limiter);
@@ -273,8 +285,10 @@ app.post('/api/auth/register', async (req, res) => {
       return res.status(400).json({ error: 'Todos los campos son requeridos' });
     }
 
-    if (!ROLES_VALIDOS.includes(rol)) {
-      return res.status(400).json({ error: `Rol inválido. Debe ser: ${ROLES_VALIDOS.join(', ')}` });
+    // [CAMBIO SERVIDOR] El registro público solo permite el rol más básico.
+    // Los demás roles los asigna el administrador desde la gestión de usuarios.
+    if (!['inspector'].includes(rol)) {
+      return res.status(400).json({ error: 'Rol inválido para el registro público' });
     }
 
     const [existing] = await pool.query('SELECT id FROM usuarios WHERE correo = ?', [correo]);
@@ -732,6 +746,8 @@ app.post('/api/obras', authenticateToken, loadUser, async (req, res) => {
     } = req.body;
 
     if (!tipo || !nombre || !ubicacion || !responsable || !estado) {
+      // [CAMBIO SERVIDOR] Se cierra la transacción abierta antes de responder.
+      await conn.rollback();
       return res.status(400).json({ error: 'Tipo, nombre, ubicación, responsable y estado son requeridos' });
     }
 
